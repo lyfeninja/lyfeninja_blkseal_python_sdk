@@ -14,7 +14,7 @@ BlkSeal provides:
 # Installation
 Install from github
 ```
-pip install git+https://github.com/No-Reality-Shows/Dread.git
+pip install git+https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
 ``` 
 or just clone to working directory, sometimes I think this is easier
 ```
