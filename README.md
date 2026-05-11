@@ -26,7 +26,7 @@ git clone https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
 # Quick Start
 
 ```
-import blkseal
+import lyfeninja_blkseal
 
 #####################################################################
 #load environment variables
@@ -42,7 +42,7 @@ lyfeninja_lease_id = os.getenv('LYFENINJA_LEASE_ID')
 #initiate client
 #####################################################################
 
-client = blkseal.BlkSealClient(
+client = lyfeninja_blkseal.BlkSealClient(
     client_id=lyfeninja_client_id,
     client_secret=lyfeninja_client_secret,
     default_scope="sign:content verify:content",
