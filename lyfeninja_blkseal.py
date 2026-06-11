@@ -85,6 +85,88 @@ class BlkSealClient:
 
         return hashlib.sha256(bytes(data)).hexdigest()
 
+    def hash_url(
+        self,
+        url: str,
+        timeout: Optional[Union[int, float]] = None,
+        max_bytes: int = 25 * 1024 * 1024,
+        chunk_size: int = 1024 * 1024,
+    ) -> str:
+        """
+        Download bytes from a public URL and return their SHA-256 hex digest.
+
+        Intended for signing/verifying external media assets such as images,
+        PDFs, audio, video, or other downloadable files. The response is streamed
+        and capped by max_bytes to avoid loading large files into memory.
+        """
+        if not isinstance(url, str) or not url.strip():
+            raise BlkSealInputError("url must be a non-empty str")
+
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme not in {"http", "https"}:
+            raise BlkSealInputError("url must use http or https")
+
+        if not parsed.netloc:
+            raise BlkSealInputError("url must include a host")
+
+        if not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise BlkSealInputError("max_bytes must be a positive integer")
+
+        if not isinstance(chunk_size, int) or chunk_size <= 0:
+            raise BlkSealInputError("chunk_size must be a positive integer")
+
+        request = urllib.request.Request(
+            url,
+            method="GET",
+            headers={
+                "Accept": "*/*",
+                "User-Agent": "lyfeninja-blkseal-python-sdk/1.0",
+            },
+        )
+
+        digest = hashlib.sha256()
+        total_bytes = 0
+        request_timeout = self.timeout if timeout is None else timeout
+
+        try:
+            with urllib.request.urlopen(request, timeout=request_timeout) as response:
+                content_length = response.headers.get("Content-Length")
+
+                if content_length is not None:
+                    try:
+                        if int(content_length) > max_bytes:
+                            raise BlkSealInputError(
+                                f"URL content exceeds max_bytes ({max_bytes})"
+                            )
+                    except ValueError:
+                        # Ignore malformed Content-Length and enforce during read.
+                        pass
+
+                while True:
+                    chunk = response.read(chunk_size)
+                    if not chunk:
+                        break
+
+                    total_bytes += len(chunk)
+                    if total_bytes > max_bytes:
+                        raise BlkSealInputError(
+                            f"URL content exceeds max_bytes ({max_bytes})"
+                        )
+
+                    digest.update(chunk)
+
+        except BlkSealInputError:
+            raise
+        except urllib.error.HTTPError as exc:
+            error_body = exc.read().decode("utf-8", errors="replace")
+            raise BlkSealAPIError(
+                f"URL fetch failed with HTTP {exc.code}: {error_body}"
+            ) from exc
+        except Exception as exc:
+            raise BlkSealAPIError(f"URL fetch failed: {exc}") from exc
+
+        return digest.hexdigest()
+
     # -------------------------
     # OAuth
     # -------------------------
@@ -253,6 +335,31 @@ class BlkSealClient:
             authenticated=True,
         )
 
+    def sign_url(
+        self,
+        lease_id: str,
+        url: str,
+        timeout: Optional[Union[int, float]] = None,
+        max_bytes: int = 25 * 1024 * 1024,
+        data_type: str = "hash",
+    ) -> Dict[str, Any]:
+        hashed = self.hash_url(
+            url,
+            timeout=timeout,
+            max_bytes=max_bytes,
+        )
+
+        return self._request_json(
+            "POST",
+            self._url("/v1/sign"),
+            {
+                "lease_id": lease_id,
+                "data": hashed,
+                "data_type": data_type,
+            },
+            authenticated=True,
+        )
+
     # -------------------------
     # Verification
     # -------------------------
@@ -298,3 +405,32 @@ class BlkSealClient:
             },
             authenticated=private,
         )
+
+    def verify_url(
+        self,
+        url: str,
+        signature_b64: str,
+        private: bool = False,
+        timeout: Optional[Union[int, float]] = None,
+        max_bytes: int = 25 * 1024 * 1024,
+        data_type: str = "hash",
+    ) -> Dict[str, Any]:
+        hashed = self.hash_url(
+            url,
+            timeout=timeout,
+            max_bytes=max_bytes,
+        )
+
+        endpoint = "/v1/verify-private" if private else "/v1/verify"
+
+        return self._request_json(
+            "POST",
+            self._url(endpoint),
+            {
+                "signature_b64": signature_b64,
+                "data": hashed,
+                "data_type": data_type,
+            },
+            authenticated=private,
+        )
+
