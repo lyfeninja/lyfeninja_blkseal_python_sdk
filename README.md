@@ -4,6 +4,7 @@ Lightweight Python client for signing and verifying digital content using lyfe.n
 Designed for zero dependencies, simple integration, and exact content verification.
 
 Learn more: https://lyfe.ninja/
+
 Integration guide: https://lyfe.ninja/products/BlkSeal/integration_guide/
 
 # Overview
