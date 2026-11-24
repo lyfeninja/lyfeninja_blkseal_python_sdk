@@ -24,10 +24,10 @@ Install from github
 ```
 pip install git+https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
 ``` 
-or just clone to working directory, sometimes I think this is easier
+<!--or just clone to working directory, sometimes I think this is easier
 ```
 git clone https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
-```
+```-->
 
 
 # Quick Start
