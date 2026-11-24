@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lyfeninja-blkseal"
+version = "0.1.0"
+description = "Python SDK for signing and verifying content with BlkSeal"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+
+authors = [
+    { name = "lyfe.ninja LLC" }
+]
+
+keywords = [
+    "blkseal",
+    "content integrity",
+    "digital signatures",
+    "provenance",
+    "attestation",
+    "security"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://lyfe.ninja/"
+Documentation = "https://lyfe.ninja/products/BlkSeal/integration_guide/"
+Repository = "https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk"
+Issues = "https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk/issues"
+
+[tool.setuptools]
+py-modules = ["lyfeninja_blkseal"]

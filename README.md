@@ -16,6 +16,10 @@ BlkSeal provides:
 - Content verification (public or authenticated)
 
 # Installation
+Install the latest stable release from PyPI
+```
+pip install lyfeninja-blkseal
+```
 Install from github
 ```
 pip install git+https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
@@ -24,7 +28,6 @@ or just clone to working directory, sometimes I think this is easier
 ```
 git clone https://github.com/lyfeninja/lyfeninja_blkseal_python_sdk.git
 ```
-(Coming soon via PyPI)
 
 
 # Quick Start
